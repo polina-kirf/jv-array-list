@@ -1,23 +1,22 @@
 package core.basesyntax;
 
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 public class ArrayList<T> implements List<T> {
     private static final int DEFAULT_CAPACITY = 10;
-    private T[] array;
+    private T[] elements;
     private int size;
 
     @SuppressWarnings("unchecked")
     public ArrayList() {
-        array = (T[]) new Object[DEFAULT_CAPACITY];
+        elements = (T[]) new Object[DEFAULT_CAPACITY];
         size = 0;
     }
 
     @Override
     public void add(T value) {
         ensureCapacity();
-        array[size] = value;
+        elements[size] = value;
         size++;
     }
 
@@ -26,9 +25,9 @@ public class ArrayList<T> implements List<T> {
         checkIndexForAdd(index);
         ensureCapacity();
 
-        System.arraycopy(array, index, array, index + 1, size - index);
+        System.arraycopy(elements, index, elements, index + 1, size - index);
 
-        array[index] = value;
+        elements[index] = value;
         size++;
     }
 
@@ -42,24 +41,24 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T get(int index) {
         checkIndex(index);
-        return array[index];
+        return elements[index];
     }
 
     @Override
     public void set(T value, int index) {
         checkIndex(index);
-        array[index] = value;
+        elements[index] = value;
     }
 
     @Override
     public T remove(int index) {
         checkIndex(index);
 
-        T removed = array[index];
+        T removed = elements[index];
 
-        System.arraycopy(array, index + 1, array, index, size - index - 1);
+        System.arraycopy(elements, index + 1, elements, index, size - index - 1);
 
-        array[--size] = null;
+        elements[--size] = null;
 
         return removed;
     }
@@ -67,9 +66,9 @@ public class ArrayList<T> implements List<T> {
     @Override
     public T remove(T element) {
         for (int i = 0; i < size; i++) {
-            if ((element == null && array[i] == null)
-                    || (element != null && element.equals(array[i]))) {
-                T removed = array[i];
+            if ((element == null && elements[i] == null)
+                    || (element != null && element.equals(elements[i]))) {
+                T removed = elements[i];
                 remove(i);
                 return removed;
             }
@@ -78,16 +77,21 @@ public class ArrayList<T> implements List<T> {
     }
 
     private void ensureCapacity() {
-        if (size == array.length) {
+        if (size == elements.length) {
             grow();
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void grow() {
-        int oldCapacity = array.length;
+        int oldCapacity = elements.length;
         int newCapacity = oldCapacity + (oldCapacity >> 1);
 
-        array = Arrays.copyOf(array, newCapacity);
+        T[] newArray = (T[]) new Object[newCapacity];
+
+        System.arraycopy(elements, 0, newArray, 0, size);
+
+        elements = newArray;
     }
 
     private void checkIndex(int index) {
